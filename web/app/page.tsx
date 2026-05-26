@@ -1,0 +1,1 @@
+export default function Page(){return <main><h1>Riverhead Budget Live</h1><p>Bootstrap online.</p></main>}
