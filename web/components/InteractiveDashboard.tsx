@@ -1,9 +1,12 @@
 import { adoptedBudget2026Summary, auditedFundBalances2024, dollars, earlyRetirementFiscalEvent, townWideComparison2026 } from '../lib/financial-data'
 import { archiveStats, financialReportsArchive } from '../lib/financial-reports-archive'
 import { sourceDocuments } from '../lib/source-documents'
+import { auditAfrClarity, fundBalanceCommentary, narrativeInsights, pressureIndicators } from '../lib/intelligence'
 
 const navItems = [
   ['Overview', '#overview'],
+  ['Insights', '#insights'],
+  ['Pressure', '#pressure'],
   ['2026 Budget', '#budget-2026'],
   ['2024 Audit', '#audit-2024'],
   ['Historical Archive', '#historical-archive'],
@@ -13,6 +16,13 @@ const navItems = [
 
 const card = { background: 'white', border: '1px solid #e2e8f0', borderRadius: 20, padding: 22, boxShadow: '0 14px 30px rgba(15,23,42,.05)' } as const
 const mini = { background: '#f8fafc', borderRadius: 12, padding: 10 } as const
+
+function statusColor(status: string) {
+  if (status === 'risk') return '#dc2626'
+  if (status === 'watch') return '#ca8a04'
+  if (status === 'positive') return '#16a34a'
+  return '#2563eb'
+}
 
 export default function InteractiveDashboard() {
   const extractedDataPoints = adoptedBudget2026Summary.length * 4 + auditedFundBalances2024.length
@@ -48,7 +58,7 @@ export default function InteractiveDashboard() {
           <div>
             <p style={{ textTransform: 'uppercase', letterSpacing: 3, fontSize: 13, color: '#2563eb', fontWeight: 900 }}>Riverhead Budget Live</p>
             <h1 style={{ fontSize: 42, lineHeight: 1.05, margin: '8px 0' }}>Source-backed municipal fiscal intelligence</h1>
-            <p style={{ fontSize: 17, maxWidth: 840, color: '#475569', marginTop: 10 }}>A public budget and financial statement explorer using official Town of Riverhead documents.</p>
+            <p style={{ fontSize: 17, maxWidth: 840, color: '#475569', marginTop: 10 }}>A public budget and financial statement explorer using official Town of Riverhead documents, plain-English insights, and source traceability.</p>
           </div>
           <div style={{ background: 'white', border: '1px solid #e2e8f0', borderRadius: 999, padding: '10px 14px', boxShadow: '0 12px 30px rgba(15,23,42,.06)', whiteSpace: 'nowrap' }}>Source-first mode</div>
         </header>
@@ -57,9 +67,9 @@ export default function InteractiveDashboard() {
           {[
             ['Archive indexed', archiveStats.indexedItems, `${archiveStats.yearsCovered} years covered`],
             ['Budget rows', adoptedBudget2026Summary.length, '2026 extracted funds'],
-            ['Audit balances', auditedFundBalances2024.length, '2024 audited values'],
-            ['2026 levy growth', `${townWideComparison2026.taxLevyPercentChange}%`, 'Town-wide tax levy change'],
-            ['Data points', extractedDataPoints, 'Source-backed fields']
+            ['Insights', narrativeInsights.length, 'Plain-English findings'],
+            ['Pressure flags', pressureIndicators.length, 'Watch items'],
+            ['2026 levy growth', `${townWideComparison2026.taxLevyPercentChange}%`, 'Town-wide tax levy change']
           ].map(([label, value, note]) => (
             <article key={String(label)} style={{ background: 'white', border: '1px solid #e2e8f0', borderRadius: 18, padding: 18, boxShadow: '0 14px 30px rgba(15,23,42,.06)' }}>
               <div style={{ color: '#64748b', textTransform: 'uppercase', fontSize: 11, fontWeight: 900 }}>{label}</div>
@@ -68,6 +78,50 @@ export default function InteractiveDashboard() {
             </article>
           ))}
         </div>
+
+        <section id="insights" style={{ ...card, scrollMarginTop: 24, marginTop: 22 }}>
+          <h2 style={{ marginTop: 0 }}>Narrative Intelligence: What Changed?</h2>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(260px,1fr))', gap: 14 }}>
+            {narrativeInsights.map((insight) => (
+              <article key={insight.title} style={{ border: '1px solid #e2e8f0', borderLeft: `6px solid ${statusColor(insight.status)}`, borderRadius: 16, padding: 16, background: '#f8fafc' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', gap: 12, alignItems: 'center' }}>
+                  <strong>{insight.title}</strong>
+                  <span style={{ color: statusColor(insight.status), fontWeight: 900, textTransform: 'uppercase', fontSize: 11 }}>{insight.status}</span>
+                </div>
+                <div style={{ fontSize: 28, fontWeight: 900, marginTop: 10 }}>{insight.value}</div>
+                <p style={{ color: '#334155' }}>{insight.explanation}</p>
+                <p style={{ color: '#475569' }}><strong>Why it matters:</strong> {insight.whyItMatters}</p>
+                <div style={{ color: '#64748b', fontSize: 11 }}>Source: {insight.source}</div>
+              </article>
+            ))}
+          </div>
+        </section>
+
+        <section id="pressure" style={{ ...card, scrollMarginTop: 24, marginTop: 22 }}>
+          <h2 style={{ marginTop: 0 }}>Budget Pressure Indicators</h2>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(230px,1fr))', gap: 12 }}>
+            {pressureIndicators.map((item) => (
+              <div key={item.label} style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: 14, padding: 14 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', gap: 10 }}>
+                  <strong>{item.label}</strong>
+                  <span style={{ color: item.status === 'Watch' ? '#ca8a04' : '#2563eb', fontWeight: 900 }}>{item.status}</span>
+                </div>
+                <p style={{ color: '#475569' }}>{item.detail}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <section style={{ ...card, scrollMarginTop: 24, marginTop: 22 }}>
+          <h2 style={{ marginTop: 0 }}>Audit / AFR / Budget Clarity</h2>
+          {auditAfrClarity.map((item) => (
+            <div key={item.label} style={{ display: 'grid', gridTemplateColumns: '1fr 190px 1.5fr', gap: 12, alignItems: 'center', borderTop: '1px solid #eef2f7', padding: '12px 0' }}>
+              <strong>{item.label}</strong>
+              <span style={{ background: '#dbeafe', color: '#1e40af', borderRadius: 999, padding: '6px 10px', textAlign: 'center', fontWeight: 900, fontSize: 12 }}>{item.badge}</span>
+              <span style={{ color: '#475569' }}>{item.meaning}</span>
+            </div>
+          ))}
+        </section>
 
         <section id="budget-2026" style={{ ...card, scrollMarginTop: 24, marginTop: 22 }}>
           <h2 style={{ marginTop: 0 }}>2026 Adopted Budget Summary</h2>
@@ -88,18 +142,19 @@ export default function InteractiveDashboard() {
         </section>
 
         <section id="audit-2024" style={{ ...card, scrollMarginTop: 24, marginTop: 22 }}>
-          <h2 style={{ marginTop: 0 }}>2024 Audited Fund Balances</h2>
-          {auditedFundBalances2024.map((fund) => (
-            <div key={fund.fund} style={{ display: 'flex', justifyContent: 'space-between', padding: '12px 0', borderTop: '1px solid #eef2f7' }}>
-              <span>{fund.fund}</span>
-              <strong>{dollars(fund.totalFundBalance)}</strong>
+          <h2 style={{ marginTop: 0 }}>2024 Audited Fund Balance Commentary</h2>
+          {fundBalanceCommentary.map((fund) => (
+            <div key={fund.fund} style={{ borderTop: '1px solid #eef2f7', padding: '12px 0' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', gap: 12 }}><strong>{fund.fund}</strong><strong>{fund.value}</strong></div>
+              <p style={{ color: '#475569' }}>{fund.comment}</p>
+              <div style={{ color: '#64748b', fontSize: 11 }}>Source: {fund.source}</div>
             </div>
           ))}
         </section>
 
         <section id="historical-archive" style={{ ...card, scrollMarginTop: 24, marginTop: 22 }}>
           <h2 style={{ marginTop: 0 }}>Historical Financial Reports Archive</h2>
-          <p style={{ color: '#475569' }}>Official documents indexed from the Town financial reports archive.</p>
+          <p style={{ color: '#475569' }}>Official documents indexed from the Town financial reports archive. These documents provide the basis for the 2022 to 2026 trend engine.</p>
           {years.map((archiveYear) => (
             <details key={archiveYear} open={archiveYear >= 2025} style={{ borderTop: '1px solid #eef2f7', padding: '12px 0' }}>
               <summary style={{ cursor: 'pointer', fontWeight: 900, fontSize: 18 }}>{archiveYear}</summary>
