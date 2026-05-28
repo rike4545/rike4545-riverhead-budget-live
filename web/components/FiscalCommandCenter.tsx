@@ -1,0 +1,215 @@
+import { analyticsModules, automatedKpis } from '../lib/analytics-modules'
+import { allOperatingFunds2026, fundBalanceUseSummary } from '../lib/all-funds'
+import { auditAfrClarity, narrativeInsights, pressureIndicators } from '../lib/intelligence'
+import { retirementProgramAssessment, retirementRiskFactors } from '../lib/retirement-risk-analysis'
+import { surplusScenario, surplusScenarioAssessment, surplusScenarioTotals } from '../lib/surplus-scenarios'
+import { archiveStats, financialReportsArchive } from '../lib/financial-reports-archive'
+import { dollars } from '../lib/financial-data'
+
+const nav = [
+  ['Command Center', '#top'],
+  ['Resident Insights', '#insights'],
+  ['All Funds', '#funds'],
+  ['Reserve Use', '#reserves'],
+  ['Scenario Lab', '#scenario'],
+  ['Retirement Risk', '#retirement'],
+  ['Automation', '#automation'],
+  ['Disclaimers', '#disclaimers'],
+]
+
+const shell = { background: 'white', border: '1px solid #e2e8f0', borderRadius: 24, boxShadow: '0 24px 60px rgba(15,23,42,.08)' } as const
+const muted = '#64748b'
+
+export default function FiscalCommandCenter() {
+  const reserveUsers = allOperatingFunds2026.filter((fund) => fund.appropriatedFundBalance2026 > 0)
+  const highestLevyFunds = [...allOperatingFunds2026].sort((a, b) => b.taxLevy2026 - a.taxLevy2026).slice(0, 6)
+  const recentDocs = financialReportsArchive.slice(0, 10)
+
+  return (
+    <main id="top" style={{ minHeight: '100vh', background: 'radial-gradient(circle at top left,#e0f2fe 0,#f8fafc 34%,#eef2ff 100%)', color: '#0f172a', fontFamily: 'Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, Arial, sans-serif' }}>
+      <section style={{ display: 'grid', gridTemplateColumns: '290px 1fr', minHeight: '100vh' }}>
+        <aside style={{ position: 'sticky', top: 0, alignSelf: 'start', height: '100vh', overflow: 'auto', padding: 22, color: 'white', background: 'linear-gradient(180deg,#061a32,#092846 60%,#020617)' }}>
+          <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+            <div style={{ width: 56, height: 56, borderRadius: 18, background: 'linear-gradient(135deg,#bfdbfe,#60a5fa)', color: '#082f49', display: 'grid', placeItems: 'center', fontWeight: 950 }}>RB</div>
+            <div>
+              <div style={{ fontSize: 22, lineHeight: 1, fontWeight: 950 }}>Riverhead<br />Budget Live</div>
+              <div style={{ color: '#bfdbfe', fontSize: 12, marginTop: 5 }}>Unofficial fiscal intelligence</div>
+            </div>
+          </div>
+
+          <div style={{ marginTop: 20, border: '1px solid rgba(252,165,165,.35)', background: 'rgba(127,29,29,.32)', borderRadius: 16, padding: 14, fontSize: 12, lineHeight: 1.45 }}>
+            <strong>Not an official Town website.</strong>
+            <div style={{ marginTop: 5, color: '#fecaca' }}>Independent public-analysis project. Verify figures against official Town source documents.</div>
+          </div>
+
+          <nav style={{ display: 'grid', gap: 8, marginTop: 26 }}>
+            {nav.map(([label, href]) => (
+              <a key={href} href={href} style={{ color: 'white', textDecoration: 'none', padding: '12px 14px', borderRadius: 14, background: 'rgba(255,255,255,.06)', border: '1px solid rgba(147,197,253,.16)', fontWeight: 800 }}>{label}</a>
+            ))}
+          </nav>
+
+          <div style={{ marginTop: 26, border: '1px solid rgba(147,197,253,.22)', borderRadius: 18, padding: 15, background: 'rgba(15,23,42,.35)' }}>
+            <strong>Source coverage</strong>
+            <div style={{ color: '#bfdbfe', marginTop: 8, fontSize: 14 }}>{archiveStats.indexedItems} documents across {archiveStats.yearsCovered} years.</div>
+          </div>
+        </aside>
+
+        <section style={{ padding: 32, maxWidth: 1500 }}>
+          <header style={{ ...shell, padding: 28, background: 'linear-gradient(135deg,#ffffff,#f8fbff)' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', gap: 20, alignItems: 'flex-start' }}>
+              <div>
+                <div style={{ color: '#2563eb', letterSpacing: 3, fontWeight: 950, fontSize: 12, textTransform: 'uppercase' }}>Municipal Fiscal Command Center</div>
+                <h1 style={{ fontSize: 46, lineHeight: 1.02, margin: '10px 0' }}>Readable budget intelligence for residents.</h1>
+                <p style={{ fontSize: 18, color: '#475569', maxWidth: 850, margin: 0 }}>Plain-English insights, fund drilldowns, reserve-use tracking, scenario modeling, and automated source parsing for Town of Riverhead financial documents.</p>
+              </div>
+              <div style={{ borderRadius: 999, background: '#dcfce7', color: '#166534', padding: '10px 14px', fontWeight: 950, whiteSpace: 'nowrap' }}>Source-first</div>
+            </div>
+          </header>
+
+          <section style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(190px,1fr))', gap: 14, marginTop: 18 }}>
+            {automatedKpis.map((kpi) => (
+              <article key={kpi.label} style={{ ...shell, padding: 18 }}>
+                <div style={{ color: muted, textTransform: 'uppercase', fontSize: 11, fontWeight: 950 }}>{kpi.label}</div>
+                <div style={{ fontSize: 32, fontWeight: 950, marginTop: 8 }}>{kpi.value}</div>
+                <p style={{ color: muted, fontSize: 13, lineHeight: 1.4 }}>{kpi.explanation}</p>
+              </article>
+            ))}
+          </section>
+
+          <section id="insights" style={{ ...shell, scrollMarginTop: 24, marginTop: 18, padding: 24 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'end', gap: 20 }}>
+              <div>
+                <h2 style={{ margin: 0 }}>Resident Insights</h2>
+                <p style={{ color: muted, marginBottom: 0 }}>What changed, why it matters, and what still needs validation.</p>
+              </div>
+              <span style={{ background: '#dbeafe', color: '#1e40af', padding: '7px 11px', borderRadius: 999, fontSize: 12, fontWeight: 950 }}>AI-assisted, source-backed</span>
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(280px,1fr))', gap: 14, marginTop: 16 }}>
+              {narrativeInsights.map((insight) => (
+                <article key={insight.title} style={{ border: '1px solid #e2e8f0', borderRadius: 18, padding: 16, background: '#f8fafc' }}>
+                  <div style={{ color: '#2563eb', fontSize: 12, fontWeight: 950, textTransform: 'uppercase' }}>{insight.status}</div>
+                  <h3 style={{ margin: '8px 0' }}>{insight.title}</h3>
+                  <div style={{ fontSize: 26, fontWeight: 950 }}>{insight.value}</div>
+                  <p style={{ color: '#334155' }}>{insight.explanation}</p>
+                  <p style={{ color: muted }}><strong>Why it matters:</strong> {insight.whyItMatters}</p>
+                </article>
+              ))}
+            </div>
+          </section>
+
+          <section id="funds" style={{ ...shell, scrollMarginTop: 24, marginTop: 18, padding: 24 }}>
+            <h2 style={{ marginTop: 0 }}>All Operating Funds / Department-Level Starting Point</h2>
+            <p style={{ color: muted }}>This view expands beyond the major funds and shows every operating fund currently extracted from the adopted budget summary. Full account/department lines will populate from the parser pipeline.</p>
+            <div style={{ display: 'grid', gap: 10 }}>
+              {allOperatingFunds2026.map((fund) => (
+                <details key={fund.code} style={{ border: '1px solid #e2e8f0', borderRadius: 16, padding: 14, background: '#f8fafc' }}>
+                  <summary style={{ cursor: 'pointer', fontWeight: 950, display: 'flex', justifyContent: 'space-between', gap: 12 }}>
+                    <span>{fund.code} — {fund.name}</span>
+                    <span>{dollars(fund.appropriations2026)}</span>
+                  </summary>
+                  <p style={{ color: '#475569' }}>{fund.description}</p>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(170px,1fr))', gap: 10 }}>
+                    <Mini label="Estimated revenues" value={dollars(fund.estimatedRevenues2026)} />
+                    <Mini label="Fund balance used" value={dollars(fund.appropriatedFundBalance2026)} />
+                    <Mini label="Tax levy" value={dollars(fund.taxLevy2026)} />
+                    <Mini label="Ending balance estimate" value={fund.estimatedFundBalance123125 ? dollars(fund.estimatedFundBalance123125) : 'Pending'} />
+                  </div>
+                  <div style={{ color: muted, fontSize: 12, marginTop: 10 }}>Source: {fund.source}</div>
+                </details>
+              ))}
+            </div>
+          </section>
+
+          <section id="reserves" style={{ ...shell, scrollMarginTop: 24, marginTop: 18, padding: 24 }}>
+            <h2 style={{ marginTop: 0 }}>Fund Balance / Reserve Use</h2>
+            <p style={{ color: muted }}>{fundBalanceUseSummary.note}</p>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(220px,1fr))', gap: 14 }}>
+              <Mini label="Appropriated fund balance" value={dollars(fundBalanceUseSummary.totalAppropriatedFundBalanceInSummary)} />
+              <Mini label="Application shown on schedule" value={dollars(fundBalanceUseSummary.totalApplicationShownOnFundBalanceSchedule)} />
+              <Mini label="Funds using balance" value={String(reserveUsers.length)} />
+            </div>
+            <div style={{ marginTop: 16 }}>
+              {fundBalanceUseSummary.highestUseFunds.map((item) => <div key={item} style={{ padding: '9px 0', borderTop: '1px solid #e2e8f0' }}>{item}</div>)}
+            </div>
+          </section>
+
+          <section id="scenario" style={{ ...shell, scrollMarginTop: 24, marginTop: 18, padding: 24 }}>
+            <h2 style={{ marginTop: 0 }}>Scenario Lab: $5M Surplus Allocation</h2>
+            <p style={{ color: muted }}>{surplusScenarioAssessment.plainEnglish}</p>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(220px,1fr))', gap: 14 }}>
+              <Mini label="Package total" value={dollars(surplusScenarioTotals.packageTotal)} />
+              <Mini label="Reserve + stabilization" value={dollars(surplusScenarioTotals.reserveAndStabilization)} />
+              <Mini label="Investment allocations" value={dollars(surplusScenarioTotals.capitalTechnologyWorkforce)} />
+              <Mini label="Remaining" value={dollars(surplusScenarioTotals.remainingFromFiveMillion)} />
+            </div>
+            <div style={{ display: 'grid', gap: 10, marginTop: 16 }}>
+              {surplusScenario.allocations.map((item) => (
+                <div key={item.category} style={{ border: '1px solid #e2e8f0', borderRadius: 14, padding: 14, background: '#f8fafc' }}>
+                  <strong>{item.category}: {dollars(item.amount)}</strong>
+                  <p style={{ color: '#475569' }}>{item.description}</p>
+                  <p style={{ color: muted }}><strong>Benefit:</strong> {item.potentialBenefit}</p>
+                  <p style={{ color: muted }}><strong>Caution:</strong> {item.caution}</p>
+                </div>
+              ))}
+            </div>
+          </section>
+
+          <section id="retirement" style={{ ...shell, scrollMarginTop: 24, marginTop: 18, padding: 24 }}>
+            <h2 style={{ marginTop: 0 }}>Early Retirement Risk Review</h2>
+            <p style={{ color: muted }}><strong>{retirementProgramAssessment.classification}:</strong> {retirementProgramAssessment.explanation}</p>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(260px,1fr))', gap: 14 }}>
+              {retirementRiskFactors.map((risk) => (
+                <article key={risk.title} style={{ border: '1px solid #e2e8f0', borderRadius: 16, padding: 14, background: '#f8fafc' }}>
+                  <div style={{ color: risk.riskLevel === 'High' ? '#dc2626' : '#ca8a04', fontWeight: 950 }}>{risk.riskLevel}</div>
+                  <h3>{risk.title}</h3>
+                  <p>{risk.description}</p>
+                  <p style={{ color: muted }}><strong>Fiscal impact:</strong> {risk.fiscalImpact}</p>
+                </article>
+              ))}
+            </div>
+          </section>
+
+          <section id="automation" style={{ ...shell, scrollMarginTop: 24, marginTop: 18, padding: 24 }}>
+            <h2 style={{ marginTop: 0 }}>Automation and Analytics Modules</h2>
+            <div style={{ display: 'grid', gap: 10 }}>
+              {analyticsModules.map((module) => (
+                <div key={module.name} style={{ display: 'grid', gridTemplateColumns: '240px 130px 1fr', gap: 14, borderTop: '1px solid #e2e8f0', padding: '12px 0' }}>
+                  <strong>{module.name}</strong>
+                  <span style={{ fontWeight: 950, color: module.status === 'active' ? '#16a34a' : module.status === 'partial' ? '#ca8a04' : '#64748b' }}>{module.status}</span>
+                  <span style={{ color: muted }}>{module.description}</span>
+                </div>
+              ))}
+            </div>
+          </section>
+
+          <section style={{ ...shell, marginTop: 18, padding: 24 }}>
+            <h2 style={{ marginTop: 0 }}>Recent Source Documents</h2>
+            {recentDocs.map((doc) => (
+              <div key={`${doc.year}-${doc.title}`} style={{ display: 'grid', gridTemplateColumns: '80px 1fr 180px', gap: 12, borderTop: '1px solid #e2e8f0', padding: '10px 0' }}>
+                <strong>{doc.year}</strong>
+                <span>{doc.title}</span>
+                <span style={{ color: '#2563eb', fontWeight: 900 }}>{doc.category.replace('_', ' ')}</span>
+              </div>
+            ))}
+          </section>
+
+          <section id="disclaimers" style={{ ...shell, scrollMarginTop: 24, marginTop: 18, padding: 24, borderLeft: '8px solid #dc2626', background: '#fff7f7' }}>
+            <h2 style={{ marginTop: 0, color: '#991b1b' }}>Important Disclaimers</h2>
+            <p>This website is an independent public-information and fiscal-analysis project. It is not an official Town of Riverhead website and is not affiliated with, endorsed by, sponsored by, or operated by the Town of Riverhead or any Town department.</p>
+            <p>Financial information is derived from publicly available source documents. Parsed values, AI-generated explanations, projections, summaries, classifications, and trend analyses may contain errors, omissions, extraction issues, OCR limitations, or timing mismatches.</p>
+            <p>Users should verify all figures and interpretations against original official source documents before relying on them.</p>
+          </section>
+        </section>
+      </section>
+    </main>
+  )
+}
+
+function Mini({ label, value }: { label: string; value: string }) {
+  return (
+    <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: 16, padding: 14 }}>
+      <div style={{ color: muted, fontSize: 12, textTransform: 'uppercase', fontWeight: 950 }}>{label}</div>
+      <strong style={{ fontSize: 20 }}>{value}</strong>
+    </div>
+  )
+}
