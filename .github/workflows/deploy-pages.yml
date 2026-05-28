@@ -38,8 +38,8 @@ jobs:
           python -m pip install --upgrade pip
           pip install requests beautifulsoup4 pypdf
 
-      - name: Parse all financial-report PDFs
-        run: python etl/parse_all_pdfs.py
+      - name: Parse all financial-report PDFs safely
+        run: python etl/run_ingestion_safe.py
 
       - name: Commit parsed financial-report data
         run: |
