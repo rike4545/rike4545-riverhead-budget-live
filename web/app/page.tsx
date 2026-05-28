@@ -1,5 +1,5 @@
-import InteractiveDashboard from '../components/InteractiveDashboard'
+import FiscalCommandCenter from '../components/FiscalCommandCenter'
 
 export default function Page() {
-  return <InteractiveDashboard />
+  return <FiscalCommandCenter />
 }
