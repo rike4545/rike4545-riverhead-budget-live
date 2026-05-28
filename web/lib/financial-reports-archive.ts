@@ -61,5 +61,6 @@ export const financialReportsArchive: FinancialReportArchiveItem[] = [
 export const archiveStats = {
   indexedItems: financialReportsArchive.length,
   yearsCovered: Array.from(new Set(financialReportsArchive.map((item) => item.year))).length,
-  sourceIndex
+  sourceIndex,
+  buildCompatibility: 'source-summary-url-fields-present'
 }
