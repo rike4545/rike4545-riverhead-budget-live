@@ -3,17 +3,40 @@ import { financialReportsArchive } from '../../lib/financial-reports-archive'
 
 const card = { background: 'white', border: '1px solid #e2e8f0', borderRadius: 18, padding: 20, boxShadow: '0 14px 34px rgba(15,23,42,.05)' } as const
 
+function sourceDescription(category: string) {
+  switch (category) {
+    case 'budget':
+      return 'Budget document used to understand appropriations, estimated revenues, levy support, and spending priorities.'
+    case 'audit':
+      return 'Audited financial statement used to compare reported results, balances, liabilities, and financial position.'
+    case 'afr':
+      return 'Annual financial report used for actual results, fund activity, and cross-year fiscal comparison.'
+    case 'justice_court':
+      return 'Justice Court cash receipt and disbursement report used for public financial transparency.'
+    case 'cpf':
+      return 'Community Preservation Fund financial statement used to evaluate dedicated land preservation resources.'
+    case 'supplement':
+      return 'Supplemental budget material used to understand supporting assumptions and budget context.'
+    default:
+      return 'Public financial record used as source material for the platform.'
+  }
+}
+
+function readableCategory(category: string) {
+  return category.replace('_', ' ')
+}
+
 export default function SourcesPage() {
   return (
     <PageShell title="Source Documents and Financial Records" subtitle="Browse budgets, audits, annual financial reports, supplements, and supporting public financial records used by the platform.">
       <section style={{ display: 'grid', gap: 14 }}>
         {financialReportsArchive.map((report) => (
-          <article key={report.title} style={card}>
+          <article key={`${report.year}-${report.title}`} style={card}>
             <div style={{ display: 'flex', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap' }}>
               <div>
-                <div style={{ color: '#2563eb', fontWeight: 900, textTransform: 'uppercase', fontSize: 12 }}>{report.category}</div>
+                <div style={{ color: '#2563eb', fontWeight: 900, textTransform: 'uppercase', fontSize: 12 }}>{readableCategory(report.category)}</div>
                 <h2 style={{ margin: '6px 0' }}>{report.title}</h2>
-                <p style={{ color: '#475569' }}>{report.summary}</p>
+                <p style={{ color: '#475569' }}>{sourceDescription(report.category)}</p>
               </div>
               <div style={{ background: '#f1f5f9', borderRadius: 999, padding: '10px 14px', fontWeight: 900, height: 'fit-content' }}>{report.year}</div>
             </div>
@@ -24,8 +47,8 @@ export default function SourcesPage() {
               <span style={{ background: '#dcfce7', color: '#166534', borderRadius: 999, padding: '8px 12px', fontWeight: 800 }}>Cross-year eligible</span>
             </div>
 
-            <a href={report.url} target="_blank" rel="noreferrer" style={{ display: 'inline-block', marginTop: 16, textDecoration: 'none', background: '#0f172a', color: 'white', padding: '12px 18px', borderRadius: 12, fontWeight: 900 }}>
-              Open source document
+            <a href={report.sourceIndex} target="_blank" rel="noreferrer" style={{ display: 'inline-block', marginTop: 16, textDecoration: 'none', background: '#0f172a', color: 'white', padding: '12px 18px', borderRadius: 12, fontWeight: 900 }}>
+              Open source index
             </a>
           </article>
         ))}
